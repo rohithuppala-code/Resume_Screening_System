@@ -43,9 +43,9 @@ graph TB
     
     subgraph APPLICATION["APPLICATION LAYER"]
         B[Flask REST API]
-        B1[/api/screen]
-        B2[/api/health]
-        B3[/api/analyze-resume]
+        B1[Screen Endpoint]
+        B2[Health Check]
+        B3[Analyze Resume]
         B --> B1
         B --> B2
         B --> B3
@@ -61,7 +61,7 @@ graph TB
         C --> C3
     end
     
-    CLIENT -->|HTTP/REST API JSON| APPLICATION
+    CLIENT -->|HTTP REST API JSON| APPLICATION
     APPLICATION -->|Process Data| PROCESSING
     
     style CLIENT fill:#e1f5ff
@@ -82,7 +82,7 @@ sequenceDiagram
     
     User->>Frontend: 1. Upload Resumes + Job Description
     Frontend->>Frontend: 2. Validate inputs & Create FormData
-    Frontend->>Backend: 3. POST /api/screen (multipart/form-data)
+    Frontend->>Backend: 3. POST API screen endpoint
     
     Backend->>Backend: 4. Validate files & job description
     Backend->>Backend: 5. Extract text from PDFs
@@ -95,11 +95,11 @@ sequenceDiagram
         NLP->>TFIDF: 9. Vectorize text
         TFIDF-->>NLP: Calculate cosine similarity
         NLP->>NLP: 10. Skill matching & overlap
-        NLP->>NLP: 11. Score = (TF-IDF × 0.7) + (Skill × 0.3)
+        NLP->>NLP: 11. Calculate final score
         NLP-->>Backend: Resume score & entities
     end
     
-    Backend->>Backend: 12. Sort by score (descending)
+    Backend->>Backend: 12. Sort by score descending
     Backend->>Backend: 13. Format JSON response
     Backend-->>Frontend: 14. Ranked results
     Frontend->>Frontend: 15. Display results & entities
@@ -112,30 +112,30 @@ sequenceDiagram
 flowchart TD
     Start([Resume Text + Job Description]) --> Split{Process in Parallel}
     
-    Split --> Branch1[TF-IDF Branch<br/>Weight: 70%]
-    Split --> Branch2[Skill Branch<br/>Weight: 30%]
+    Split --> Branch1[TF-IDF Branch<br/>Weight: 70 percent]
+    Split --> Branch2[Skill Branch<br/>Weight: 30 percent]
     Split --> Branch3[Entity Branch<br/>Informational]
     
     Branch1 --> V1[Vectorize texts]
     V1 --> C1[Calculate cosine similarity]
-    C1 --> Score1[TF-IDF Score<br/>0.0 - 1.0]
+    C1 --> Score1[TF-IDF Score<br/>Range: 0.0 to 1.0]
     
     Branch2 --> E1[Extract skills from both]
     E1 --> C2[Compare skill overlap]
-    C2 --> Score2[Skill Match Score<br/>0.0 - 1.0]
+    C2 --> Score2[Skill Match Score<br/>Range: 0.0 to 1.0]
     
     Branch3 --> E2[Extract entities using spaCy]
-    E2 --> Cat[Categorize:<br/>SKILL, ORG, EDUCATION]
+    E2 --> Cat[Categorize<br/>SKILL ORG EDUCATION]
     Cat --> Meta[Entity Metadata<br/>for display]
     
-    Score1 --> Combine[Final Score =<br/>TF-IDF × 0.7 + Skill × 0.3]
+    Score1 --> Combine[Final Score Calculation<br/>TF-IDF weight 0.7 plus Skill weight 0.3]
     Score2 --> Combine
     
-    Combine --> Convert[Convert to Percentage<br/>Score × 100]
+    Combine --> Convert[Convert to Percentage<br/>Score times 100]
     Convert --> Result[Ranked Result]
     Meta --> Result
     
-    Result --> Output([Score: 85%<br/>+ Entities<br/>+ Metadata])
+    Result --> Output([Score 85 percent<br/>Plus Entities<br/>Plus Metadata])
     
     style Start fill:#e1f5ff
     style Split fill:#fff4e1
