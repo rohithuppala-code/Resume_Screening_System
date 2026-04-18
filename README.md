@@ -29,159 +29,121 @@ An intelligent resume screening system that automatically analyzes and ranks can
 
 ### System Architecture Diagram
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         CLIENT LAYER                             │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │              React Frontend (Vite)                        │   │
-│  │  • Landing Page  • Upload Interface  • Results Display   │   │
-│  └──────────────────────────────────────────────────────────┘   │
-└────────────────────────────┬────────────────────────────────────┘
-                             │ HTTP/REST API
-                             │ (JSON)
-┌────────────────────────────▼────────────────────────────────────┐
-│                      APPLICATION LAYER                           │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │                 Flask REST API                            │   │
-│  │  • /api/screen  • /api/health  • /api/analyze-resume    │   │
-│  └──────────────────────────────────────────────────────────┘   │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-┌────────────────────────────▼────────────────────────────────────┐
-│                      PROCESSING LAYER                            │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │              NLP Processor Module                         │   │
-│  │  ┌────────────┐  ┌────────────┐  ┌─────────────────┐    │   │
-│  │  │   spaCy    │  │  PyPDF2    │  │  scikit-learn   │    │   │
-│  │  │    NER     │  │  Extractor │  │   TF-IDF/Cosine │    │   │
-│  │  └────────────┘  └────────────┘  └─────────────────┘    │   │
-│  └──────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph CLIENT["CLIENT LAYER"]
+        A[React Frontend - Vite]
+        A1[Landing Page]
+        A2[Upload Interface]
+        A3[Results Display]
+        A --> A1
+        A --> A2
+        A --> A3
+    end
+    
+    subgraph APPLICATION["APPLICATION LAYER"]
+        B[Flask REST API]
+        B1[/api/screen]
+        B2[/api/health]
+        B3[/api/analyze-resume]
+        B --> B1
+        B --> B2
+        B --> B3
+    end
+    
+    subgraph PROCESSING["PROCESSING LAYER"]
+        C[NLP Processor Module]
+        C1[spaCy NER]
+        C2[PyPDF2 Extractor]
+        C3[scikit-learn TF-IDF]
+        C --> C1
+        C --> C2
+        C --> C3
+    end
+    
+    CLIENT -->|HTTP/REST API JSON| APPLICATION
+    APPLICATION -->|Process Data| PROCESSING
+    
+    style CLIENT fill:#e1f5ff
+    style APPLICATION fill:#fff4e1
+    style PROCESSING fill:#f0e1ff
 ```
 
 ### Data Flow Diagram
 
-```
-┌──────────────┐
-│     User     │
-└──────┬───────┘
-       │ 1. Upload Resumes + Job Description
-       ▼
-┌─────────────────────────────────────────┐
-│         React Frontend                   │
-│  • Validate inputs                       │
-│  • Create FormData                       │
-└──────┬──────────────────────────────────┘
-       │ 2. POST /api/screen
-       │    (multipart/form-data)
-       ▼
-┌─────────────────────────────────────────┐
-│         Flask Backend                    │
-│  • Validate files & job description      │
-│  • Extract text from PDFs                │
-└──────┬──────────────────────────────────┘
-       │ 3. Process each resume
-       ▼
-┌─────────────────────────────────────────┐
-│       NLP Processor                      │
-│  ┌───────────────────────────────────┐  │
-│  │ 4. Text Extraction & Cleaning     │  │
-│  │    • Remove special characters    │  │
-│  │    • Normalize whitespace         │  │
-│  └───────────────────────────────────┘  │
-│  ┌───────────────────────────────────┐  │
-│  │ 5. Entity Recognition (spaCy)     │  │
-│  │    • Extract SKILL entities       │  │
-│  │    • Extract ORG (companies)      │  │
-│  │    • Extract education info       │  │
-│  └───────────────────────────────────┘  │
-│  ┌───────────────────────────────────┐  │
-│  │ 6. TF-IDF Vectorization           │  │
-│  │    • Convert text to vectors      │  │
-│  │    • Calculate cosine similarity  │  │
-│  └───────────────────────────────────┘  │
-│  ┌───────────────────────────────────┐  │
-│  │ 7. Skill Matching                 │  │
-│  │    • Compare extracted skills     │  │
-│  │    • Calculate skill overlap      │  │
-│  └───────────────────────────────────┘  │
-│  ┌───────────────────────────────────┐  │
-│  │ 8. Score Calculation              │  │
-│  │    Score = (TF-IDF × 0.7) +       │  │
-│  │            (Skill Match × 0.3)    │  │
-│  └───────────────────────────────────┘  │
-└──────┬──────────────────────────────────┘
-       │ 9. Ranked results
-       ▼
-┌─────────────────────────────────────────┐
-│         Flask Backend                    │
-│  • Sort by score (descending)            │
-│  • Format response JSON                  │
-└──────┬──────────────────────────────────┘
-       │ 10. JSON Response
-       ▼
-┌─────────────────────────────────────────┐
-│         React Frontend                   │
-│  • Display ranked results                │
-│  • Show match percentages                │
-│  • Render extracted entities             │
-└──────┬──────────────────────────────────┘
-       │ 11. Visual results
-       ▼
-┌──────────────┐
-│     User     │
-└──────────────┘
+```mermaid
+sequenceDiagram
+    actor User
+    participant Frontend as React Frontend
+    participant Backend as Flask Backend
+    participant NLP as NLP Processor
+    participant spaCy
+    participant TFIDF as TF-IDF Engine
+    
+    User->>Frontend: 1. Upload Resumes + Job Description
+    Frontend->>Frontend: 2. Validate inputs & Create FormData
+    Frontend->>Backend: 3. POST /api/screen (multipart/form-data)
+    
+    Backend->>Backend: 4. Validate files & job description
+    Backend->>Backend: 5. Extract text from PDFs
+    
+    loop For each resume
+        Backend->>NLP: 6. Process resume
+        NLP->>NLP: 7. Text Extraction & Cleaning
+        NLP->>spaCy: 8. Extract entities
+        spaCy-->>NLP: Skills, Companies, Education
+        NLP->>TFIDF: 9. Vectorize text
+        TFIDF-->>NLP: Calculate cosine similarity
+        NLP->>NLP: 10. Skill matching & overlap
+        NLP->>NLP: 11. Score = (TF-IDF × 0.7) + (Skill × 0.3)
+        NLP-->>Backend: Resume score & entities
+    end
+    
+    Backend->>Backend: 12. Sort by score (descending)
+    Backend->>Backend: 13. Format JSON response
+    Backend-->>Frontend: 14. Ranked results
+    Frontend->>Frontend: 15. Display results & entities
+    Frontend-->>User: 16. Visual ranked results
 ```
 
 ### Scoring Algorithm Flow
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    SCORING ALGORITHM                         │
-└─────────────────────────────────────────────────────────────┘
-
-Input: Resume Text + Job Description
-   │
-   ├─────────────────────────────────────┬──────────────────────────────┐
-   │                                     │                              │
-   ▼                                     ▼                              ▼
-┌──────────────────┐          ┌──────────────────┐         ┌──────────────────┐
-│  TF-IDF Branch   │          │  Skill Branch    │         │  Entity Branch   │
-│  (70% weight)    │          │  (30% weight)    │         │  (Informational) │
-└────────┬─────────┘          └────────┬─────────┘         └────────┬─────────┘
-         │                              │                            │
-         │ 1. Vectorize texts           │ 1. Extract skills          │ 1. Extract entities
-         │ 2. Calculate cosine          │ 2. Compare overlap         │ 2. Categorize
-         │    similarity                │ 3. Calculate ratio         │    (SKILL, ORG, etc.)
-         │                              │                            │
-         ▼                              ▼                            ▼
-    TF-IDF Score                   Skill Score              Entity Metadata
-    (0.0 - 1.0)                    (0.0 - 1.0)              (for display)
-         │                              │                            │
-         └──────────────┬───────────────┘                            │
-                        │                                            │
-                        ▼                                            │
-              ┌──────────────────┐                                  │
-              │  Final Score     │                                  │
-              │  = (TF-IDF×0.7)  │                                  │
-              │    + (Skill×0.3) │                                  │
-              └────────┬─────────┘                                  │
-                       │                                            │
-                       ▼                                            │
-              ┌──────────────────┐                                  │
-              │  Convert to %    │                                  │
-              │  (Score × 100)   │                                  │
-              └────────┬─────────┘                                  │
-                       │                                            │
-                       └────────────────┬───────────────────────────┘
-                                        │
-                                        ▼
-                              ┌──────────────────┐
-                              │  Ranked Result   │
-                              │  • Score: 85%    │
-                              │  • Entities      │
-                              │  • Metadata      │
-                              └──────────────────┘
+```mermaid
+flowchart TD
+    Start([Resume Text + Job Description]) --> Split{Process in Parallel}
+    
+    Split --> Branch1[TF-IDF Branch<br/>Weight: 70%]
+    Split --> Branch2[Skill Branch<br/>Weight: 30%]
+    Split --> Branch3[Entity Branch<br/>Informational]
+    
+    Branch1 --> V1[Vectorize texts]
+    V1 --> C1[Calculate cosine similarity]
+    C1 --> Score1[TF-IDF Score<br/>0.0 - 1.0]
+    
+    Branch2 --> E1[Extract skills from both]
+    E1 --> C2[Compare skill overlap]
+    C2 --> Score2[Skill Match Score<br/>0.0 - 1.0]
+    
+    Branch3 --> E2[Extract entities using spaCy]
+    E2 --> Cat[Categorize:<br/>SKILL, ORG, EDUCATION]
+    Cat --> Meta[Entity Metadata<br/>for display]
+    
+    Score1 --> Combine[Final Score =<br/>TF-IDF × 0.7 + Skill × 0.3]
+    Score2 --> Combine
+    
+    Combine --> Convert[Convert to Percentage<br/>Score × 100]
+    Convert --> Result[Ranked Result]
+    Meta --> Result
+    
+    Result --> Output([Score: 85%<br/>+ Entities<br/>+ Metadata])
+    
+    style Start fill:#e1f5ff
+    style Split fill:#fff4e1
+    style Branch1 fill:#ffe1e1
+    style Branch2 fill:#e1ffe1
+    style Branch3 fill:#f0e1ff
+    style Output fill:#e1f5ff
+    style Result fill:#ffd700
 ```
 
 ---
