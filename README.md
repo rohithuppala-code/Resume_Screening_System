@@ -64,9 +64,21 @@ graph TB
     CLIENT -->|HTTP REST API JSON| APPLICATION
     APPLICATION -->|Process Data| PROCESSING
     
-    style CLIENT fill:#e1f5ff
-    style APPLICATION fill:#fff4e1
-    style PROCESSING fill:#f0e1ff
+    style CLIENT fill:#e1f5ff,stroke:#333,stroke-width:2px,color:#000
+    style APPLICATION fill:#fff4e1,stroke:#333,stroke-width:2px,color:#000
+    style PROCESSING fill:#f0e1ff,stroke:#333,stroke-width:2px,color:#000
+    style A fill:#4fc3f7,stroke:#333,stroke-width:2px,color:#000
+    style A1 fill:#81d4fa,stroke:#333,stroke-width:2px,color:#000
+    style A2 fill:#81d4fa,stroke:#333,stroke-width:2px,color:#000
+    style A3 fill:#81d4fa,stroke:#333,stroke-width:2px,color:#000
+    style B fill:#ffb74d,stroke:#333,stroke-width:2px,color:#000
+    style B1 fill:#ffcc80,stroke:#333,stroke-width:2px,color:#000
+    style B2 fill:#ffcc80,stroke:#333,stroke-width:2px,color:#000
+    style B3 fill:#ffcc80,stroke:#333,stroke-width:2px,color:#000
+    style C fill:#ba68c8,stroke:#333,stroke-width:2px,color:#000
+    style C1 fill:#ce93d8,stroke:#333,stroke-width:2px,color:#000
+    style C2 fill:#ce93d8,stroke:#333,stroke-width:2px,color:#000
+    style C3 fill:#ce93d8,stroke:#333,stroke-width:2px,color:#000
 ```
 
 ### Data Flow Diagram
@@ -137,13 +149,24 @@ flowchart TD
     
     Result --> Output([Score 85 percent<br/>Plus Entities<br/>Plus Metadata])
     
-    style Start fill:#e1f5ff
-    style Split fill:#fff4e1
-    style Branch1 fill:#ffe1e1
-    style Branch2 fill:#e1ffe1
-    style Branch3 fill:#f0e1ff
-    style Output fill:#e1f5ff
-    style Result fill:#ffd700
+    style Start fill:#4fc3f7,stroke:#333,stroke-width:2px,color:#000
+    style Split fill:#fff59d,stroke:#333,stroke-width:2px,color:#000
+    style Branch1 fill:#ef9a9a,stroke:#333,stroke-width:2px,color:#000
+    style Branch2 fill:#a5d6a7,stroke:#333,stroke-width:2px,color:#000
+    style Branch3 fill:#ce93d8,stroke:#333,stroke-width:2px,color:#000
+    style V1 fill:#ffccbc,stroke:#333,stroke-width:2px,color:#000
+    style C1 fill:#ffccbc,stroke:#333,stroke-width:2px,color:#000
+    style Score1 fill:#ffccbc,stroke:#333,stroke-width:2px,color:#000
+    style E1 fill:#c5e1a5,stroke:#333,stroke-width:2px,color:#000
+    style C2 fill:#c5e1a5,stroke:#333,stroke-width:2px,color:#000
+    style Score2 fill:#c5e1a5,stroke:#333,stroke-width:2px,color:#000
+    style E2 fill:#e1bee7,stroke:#333,stroke-width:2px,color:#000
+    style Cat fill:#e1bee7,stroke:#333,stroke-width:2px,color:#000
+    style Meta fill:#e1bee7,stroke:#333,stroke-width:2px,color:#000
+    style Combine fill:#80deea,stroke:#333,stroke-width:2px,color:#000
+    style Convert fill:#80deea,stroke:#333,stroke-width:2px,color:#000
+    style Result fill:#ffd54f,stroke:#333,stroke-width:3px,color:#000
+    style Output fill:#4fc3f7,stroke:#333,stroke-width:2px,color:#000
 ```
 
 ---
